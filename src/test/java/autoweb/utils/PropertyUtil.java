@@ -5,7 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 public class PropertyUtil {
+
+	protected static final Logger log = LogManager.getLogger(PropertyUtil.class);
 
 	private final String separator = new File("").separator;
 	protected final String projectPath = System.getProperty("user.dir");
@@ -15,7 +21,7 @@ public class PropertyUtil {
 		this.prop = new Properties();
 		String propertiesPath = projectPath + separator + "src" + separator + "test" + separator +
 				"resources" + separator + (testCaseName.toLowerCase())+".properties";
-		System.out.printf("propertiesPath : %s \n", propertiesPath);
+		log.info("propertiesPath : {} ", propertiesPath);
 		try {
 			prop.load(Files.newBufferedReader(Paths.get(
 					propertiesPath

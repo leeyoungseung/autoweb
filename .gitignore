@@ -16,3 +16,4 @@ logs/*
 test-output/*
 
 src/test/resources/*.properties
+opencv/*

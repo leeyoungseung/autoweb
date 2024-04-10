@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -22,12 +25,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class AutoBase {
+
+	protected static final Logger log = LogManager.getLogger(AutoBase.class);
 
 	private static String projectPath = System.getProperty("user.dir");
 	protected static final Properties prop;
@@ -55,19 +64,20 @@ public class AutoBase {
 
 
 	public static RemoteWebDriver initDriver(String browser) throws MalformedURLException {
+		return initDriver(browser, null);
+	}
+
+	public static RemoteWebDriver initDriver(String browser, AbstractDriverOptions browserOptions)
+			throws MalformedURLException {
 
 		if ("edge".equals(browser)) {
-			EdgeOptions options = new EdgeOptions();
-			// options.addArguments("--headless=new");
-			options.addArguments("--ignore-ssl-errors=yes");
-			options.addArguments("--ignore-certificate-errors");
-			options.addArguments("--disable-extensions");
-			options.addArguments("--disable-notifications");
-			options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+			EdgeOptions options;
 
-		    LoggingPreferences logPrefs = new LoggingPreferences();
-		    logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-		    options.setCapability(EdgeOptions.LOGGING_PREFS, logPrefs);
+			if (browserOptions != null) {
+				options = (EdgeOptions) browserOptions;
+			} else {
+				options = new EdgeOptions();
+			}
 
 			File logLocation = new File(logPath, sdf.format(new Date()) +"_"+"edge.log");
 		    EdgeDriverService service = new EdgeDriverService.Builder()
@@ -87,6 +97,9 @@ public class AutoBase {
 
 	        URL address = new URL(prop.getProperty("grid.hub.url"));
 	        return new RemoteWebDriver(address, options);
+		} else if ("firefox".equals(browser)) {
+			FirefoxOptions options = new FirefoxOptions();
+
 		}
 
 		return null;
@@ -156,6 +169,21 @@ public class AutoBase {
 		System.out.printf("Text : %s, Tagname : %s \n", el.getText(), el.getTagName());
 		System.out.printf("isDisplayed : %s, isEnabled : %s, isSelected : %s \n", el.isDisplayed(), el.isEnabled(), el.isSelected());
 		System.out.printf("Location : [%s, %s] , Size : %s \n", el.getLocation().getX(), el.getLocation().getY(), el.getSize());
+	}
+
+
+	protected void sendkey(Actions ac, Keys key, int waitTime) throws InterruptedException {
+		log.info("START-sendkey Keys : {}, sendkey.toString {}, Wait Time : {}", key, key.toString(), waitTime);
+		ac.sendKeys(key).perform();  Thread.sleep(waitTime);
+		log.info("END-sendkey Keys : {}, sendkey.toString {}, Wait Time : {}", key, key.toString(), waitTime);
+	}
+
+	protected void sendkeyLoop(Actions ac, Keys key, int waitTime, int loopCount) throws InterruptedException {
+		log.info("START-sendkeyLoop LoopCount : {}", loopCount);
+		for (int i=0; i<loopCount; i++) {
+			sendkey(ac, key, waitTime);
+		}
+		log.info("END-sendkeyLoop LoopCount : {}", loopCount);
 	}
 
 }

@@ -14,6 +14,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.logging.LogType;
 // import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,7 +35,7 @@ public class MyTest02 extends AutoBase {
 		Thread.sleep(7000);
 		screenShot("001-executeApp", driver);
 
-		//driver.manage().logs().get(LogType.PERFORMANCE).getAll().forEach(System.out::println);
+		driver.manage().logs().get(LogType.PERFORMANCE).getAll().forEach(System.out::println);
 
 		WebElement el = driver.findElement(
 				By.xpath("/html/body/div/main/div/div/div[1]/div[1]/div/div"));
